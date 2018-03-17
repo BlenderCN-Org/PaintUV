@@ -4,7 +4,7 @@ bl_info = {
 	"author": "Nexus Studio",
 	"version": (0,0,3),
 	"blender": (2,79),
-	"location": "T > Nexus Tools",
+	"location": "T > Nexus Tools, Edit mesh > U > Unwrap and paint uv",
 	"description": "Tools",
 	"warning": "",
 	"wiki_url": "None",
