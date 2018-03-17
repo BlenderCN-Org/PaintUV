@@ -85,7 +85,7 @@ class PaintUVPanel(bpy.types.Panel):
 
 		row = layout.row()
 		row.operator("object.paint_uv", text="Paint by UV")
-		#row.operator("object.del_dulpi_mat", text="Delete materials")
+
 
 class PaintUVOperator(bpy.types.Operator):
 	"""Paint all UV islands"""
@@ -118,7 +118,6 @@ class MenuUnwrapOperator(bpy.types.Operator):
 
 		return {'FINISHED'}
 
-
 def register():
 	bpy.utils.register_class(PaintUVPanel)
 	bpy.utils.register_class(PaintUVOperator)
@@ -130,7 +129,6 @@ def unregister():
 	bpy.utils.unregister_class(PaintUVOperator)
 	bpy.utils.unregister_class(MenuUnwrapOperator)
 	bpy.types.VIEW3D_MT_uv_map.remove(MenuFuncUnwrap)
-
 
 if __name__ == "__main__":
 	register()
