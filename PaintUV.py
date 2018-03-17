@@ -29,7 +29,6 @@ def SetRandomBrushColor():
 
 def IsWhiteVertex(color_map, index):
 	""""Return True if vertex color equal white color (1.0, 1.0, 1.0)"""
-	print(index)
 	col = color_map.data[index].color
 	return col[0] == 1.0 and col[1] == 1.0 and col[2] == 1.0
 
@@ -51,7 +50,7 @@ def FindAndPaint():
 
 	color_map = my_object.vertex_colors.active
 	polygons = my_object.polygons
-	
+
 	index = 0
 	for poly in polygons:
 		print("Index poly: ", poly.index)
