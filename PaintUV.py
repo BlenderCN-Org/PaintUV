@@ -12,7 +12,7 @@ bl_info = {
 }
 
 import bpy
-from random import uniform
+from random import random
 
 
 def MenuFuncUnwrap(self, context):
@@ -21,9 +21,9 @@ def MenuFuncUnwrap(self, context):
 
 def SetRandomBrushColor():
 	"""Generate random color to brush"""
-	r = uniform(0.0, 1.0)
-	g = uniform(0.0, 1.0)
-	b = uniform(0.0, 1.0)
+	r = random()
+	g = random()
+	b = random()
 	bpy.data.brushes["Draw"].color = (r, g, b)
 
 
@@ -35,38 +35,42 @@ def IsWhiteVertex(color_map, index):
 def FindAndPaint():
 	my_object = bpy.context.active_object.data
 
-	my_object.use_paint_mask = True
+	if not my_object.use_paint_mask:
+		my_object.use_paint_mask = True
 	
-	bpy.ops.object.mode_set( mode = 'EDIT' )
-	bpy.ops.mesh.select_all( action = 'DESELECT' )
-	bpy.ops.object.mode_set( mode = 'OBJECT' )
+	# bpy.ops.object.mode_set( mode = 'EDIT' )
+	# bpy.ops.mesh.select_all( action = 'DESELECT' )
+	# bpy.ops.object.mode_set( mode = 'OBJECT' )
 
 	# if not color map created else remove active color map and created new
 	if not my_object.vertex_colors:
-		my_object.vertex_colors.new()
+		color_map = my_object.vertex_colors.new()
+		color_map.name = "IDMASK"
 	else:
 		bpy.ops.mesh.vertex_color_remove()
 		my_object.vertex_colors.new()
 
 	color_map = my_object.vertex_colors.active
-	polygons = my_object.polygons
-
-	index = 0
+	polygons = my_object.uv_layers.data.polygons
+	
+	#index = 0
 	for poly in polygons:
-		print("Index poly: ", poly.index)
-		for idx in poly.loop_indices:
-			if IsWhiteVertex(color_map, index):
-				bpy.ops.object.mode_set(mode='VERTEX_PAINT')
-				bpy.ops.paint.face_select_all( action = 'DESELECT' )
-				poly.select = True
-				bpy.ops.paint.face_select_linked()
-				SetRandomBrushColor()
-				bpy.ops.paint.vertex_color_set()
-				bpy.ops.object.mode_set(mode='OBJECT')
-			index += 1
+		#for idx in poly.loop_indices:
+		#if IsWhiteVertex(color_map, index):
+		bpy.ops.object.mode_set( mode = 'EDIT' )
+		bpy.ops.mesh.select_all( action = 'DESELECT' )
+		bpy.ops.object.mode_set( mode = 'OBJECT' )
+		poly.select = True
+		bpy.ops.object.mode_set(mode='EDIT')
+		bpy.ops.uv.select_linked(extend=False)
+		bpy.ops.object.mode_set(mode='VERTEX_PAINT')
+		SetRandomBrushColor()
+		bpy.ops.paint.vertex_color_set()
+		#index += 1
 
-	bpy.ops.object.mode_set(mode='VERTEX_PAINT')
-	bpy.ops.paint.face_select_all( action = 'DESELECT' )
+
+	#bpy.ops.object.mode_set(mode='VERTEX_PAINT')
+	#bpy.ops.paint.face_select_all( action = 'DESELECT' )
 
 class PaintUVPanel(bpy.types.Panel):
 	"""Creates a Panel in the view3d context of the tools panel (key "T")"""
