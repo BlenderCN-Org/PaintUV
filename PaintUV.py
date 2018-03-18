@@ -53,15 +53,16 @@ def FindAndPaint():
 	if not CheckColorMapName(my_object.vertex_colors, 'ISLANDS_PAINT'):
 		color_map = my_object.vertex_colors.new()
 		color_map.name = 'ISLANDS_PAINT'
-		color_map.active = True
 	else:
 		my_object.vertex_colors['ISLANDS_PAINT'].active = True
 		bpy.ops.mesh.vertex_color_remove()
 		color_map = my_object.vertex_colors.new()
 		color_map.name = 'ISLANDS_PAINT'
 
+	color_map = my_object.vertex_colors['ISLANDS_PAINT']
+	color_map.active = True
+
 	#color_map = my_object.vertex_colors['ISLANDS_PAINT']
-	print(color_map.name)
 	polygons = my_object.uv_layers.data.polygons
 	
 	#index = 0
