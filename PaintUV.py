@@ -32,6 +32,14 @@ def IsWhiteVertex(color_map, index):
 	col = color_map.data[index].color
 	return col[0] == 1.0 and col[1] == 1.0 and col[2] == 1.0
 
+
+def CheckColorMapName(color_maps, FindName):
+	for color_map in color_maps:
+		if color_map.name == FindName:
+			return True
+
+	return False
+
 def FindAndPaint():
 	my_object = bpy.context.active_object.data
 
@@ -41,14 +49,17 @@ def FindAndPaint():
 	bpy.ops.mesh.select_all( action = 'DESELECT' )
 	bpy.ops.object.mode_set( mode = 'OBJECT' )
 
+	color_map = ''
 	# if not color map created else remove active color map and created new
-	if not my_object.vertex_colors:
-		my_object.vertex_colors.new()
+	if not CheckColorMapName(my_object.vertex_colors, 'ISLANDS_PAINT'):
+		color_map = my_object.vertex_colors.new()
+		color_map.name = 'ISLANDS_PAINT'
+		color_map.active = True
 	else:
+		my_object.vertex_colors['ISLANDS_PAINT'].active = True
 		bpy.ops.mesh.vertex_color_remove()
-		my_object.vertex_colors.new()
-
-	color_map = my_object.vertex_colors.active
+		color_map = my_object.vertex_colors.new()
+		color_map.name = 'ISLANDS_PAINT'
 	polygons = my_object.polygons
 
 	index = 0
