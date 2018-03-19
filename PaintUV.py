@@ -14,6 +14,7 @@ bl_info = {
 import bpy
 from random import uniform
 from bpy.props import BoolProperty
+# import time
 
 
 def MenuFuncUnwrap(self, context):
@@ -41,47 +42,57 @@ def CheckColorMapName(color_maps, FindName):
 
 	return False
 
-def FindAndPaint(Seam):
+def FindAndPaint(CreateSeam):
 	my_object = bpy.context.active_object.data
 
 	my_object.use_paint_mask = True
-	
+
 	bpy.ops.object.mode_set( mode = 'EDIT' )
 	bpy.ops.mesh.select_all( action = 'DESELECT' )
 	bpy.ops.object.mode_set( mode = 'OBJECT' )
 
-	color_map = ''
+
 	# if not color map created else remove active color map and created new
 	if not CheckColorMapName(my_object.vertex_colors, 'ISLANDS_PAINT'):
 		color_map = my_object.vertex_colors.new()
 		color_map.name = 'ISLANDS_PAINT'
-		color_map.active = True
 	else:
 		my_object.vertex_colors['ISLANDS_PAINT'].active = True
 		bpy.ops.mesh.vertex_color_remove()
 		color_map = my_object.vertex_colors.new()
 		color_map.name = 'ISLANDS_PAINT'
+
+	color_map = my_object.vertex_colors['ISLANDS_PAINT']
+	color_map.active = True
 	polygons = my_object.polygons
 
-	if Seam:
+	if CreateSeam:
 		bpy.ops.object.mode_set( mode = 'EDIT' )
-		bpy.ops.mesh.select_all( action = 'SELECT' )
 		bpy.ops.uv.seams_from_islands()
+		bpy.ops.object.mode_set( mode = 'OBJECT' )
+	# time.sleep(2)
 
 	index = 0
-	for poly in polygons:						
+	for poly in polygons:
 		for idx in poly.loop_indices:
 			if IsWhiteVertex(color_map, index):
-				bpy.ops.object.mode_set(mode='VERTEX_PAINT')
+				bpy.ops.object.mode_set( mode = 'VERTEX_PAINT' )
 				bpy.ops.paint.face_select_all( action = 'DESELECT' )
 				poly.select = True
 				bpy.ops.paint.face_select_linked()
 				SetRandomBrushColor()
 				bpy.ops.paint.vertex_color_set()
-				bpy.ops.object.mode_set(mode='OBJECT')
+				# bpy.ops.object.mode_set(mode='EDIT')
+				# bpy.ops.mesh.select_all( action = 'DESELECT' )
+				# poly.select = True
+				# bpy.ops.mesh.select_linked(delimit={'SEAM'})
+				# bpy.ops.object.mode_set(mode='VERTEX_PAINT')
+				# SetRandomBrushColor()
+				# bpy.ops.paint.vertex_color_set()
+				#bpy.ops.object.mode_set( mode = 'OBJECT' )
 			index += 1
 
-	bpy.ops.object.mode_set(mode='VERTEX_PAINT')
+	bpy.ops.object.mode_set( mode = 'VERTEX_PAINT' )
 	bpy.ops.paint.face_select_all( action = 'DESELECT' )
 
 class PaintUVPanel(bpy.types.Panel):
@@ -157,3 +168,4 @@ def unregister():
 
 if __name__ == "__main__":
 	register()
+	bpy.context.scene.seam_from_islands = True
