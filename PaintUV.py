@@ -16,7 +16,6 @@ from random import uniform
 from bpy.props import BoolProperty
 # import time
 
-
 def MenuFuncUnwrap(self, context):
 	self.layout.separator()
 	self.layout.operator(MenuUnwrapOperator.bl_idname, text="Unwrap and paint uv", icon="VPAINT_HLT")
@@ -42,7 +41,7 @@ def CheckColorMapName(color_maps, FindName):
 
 	return False
 
-def FindAndPaint(CreateSeam):
+def FindAndPaint():
 	my_object = bpy.context.active_object.data
 
 	my_object.use_paint_mask = True
@@ -50,7 +49,6 @@ def FindAndPaint(CreateSeam):
 	bpy.ops.object.mode_set( mode = 'EDIT' )
 	bpy.ops.mesh.select_all( action = 'DESELECT' )
 	bpy.ops.object.mode_set( mode = 'OBJECT' )
-
 
 	# if not color map created else remove active color map and created new
 	if not CheckColorMapName(my_object.vertex_colors, 'ISLANDS_PAINT'):
@@ -65,12 +63,6 @@ def FindAndPaint(CreateSeam):
 	color_map = my_object.vertex_colors['ISLANDS_PAINT']
 	color_map.active = True
 	polygons = my_object.polygons
-
-	if CreateSeam:
-		bpy.ops.object.mode_set( mode = 'EDIT' )
-		bpy.ops.uv.seams_from_islands()
-		bpy.ops.object.mode_set( mode = 'OBJECT' )
-	# time.sleep(2)
 
 	index = 0
 	for poly in polygons:
@@ -104,11 +96,6 @@ class PaintUVPanel(bpy.types.Panel):
 	bl_category = "Nexus Tools"
 	bl_context = "objectmode"
 
-	seam_from_islands = bpy.types.Scene.seam_from_islands = BoolProperty(
-		name = "Seam From Islands",
-		default = False
-	)
-
 	def draw(self, context):
 		layout = self.layout
 		obj = context.object
@@ -131,8 +118,11 @@ class PaintUVOperator(bpy.types.Operator):
 		return context.mode == "OBJECT"
 
 	def execute(self, context):
-		#if context.seam_from_islands:
-		FindAndPaint(True)
+		if context.scene.seam_from_islands:
+			bpy.ops.object.mode_set( mode = 'EDIT' )
+			bpy.ops.uv.seams_from_islands()
+
+		FindAndPaint()
 		#else:
 		#	FindAndPaint(False)
 
@@ -150,11 +140,15 @@ class MenuUnwrapOperator(bpy.types.Operator):
 
 	def execute(self, context):
 		bpy.ops.uv.unwrap()
-		FindAndPaint(False)
+		FindAndPaint()
 
 		return {'FINISHED'}
 
 def register():
+	bpy.types.Scene.seam_from_islands = BoolProperty(
+		name = "Seam From Islands",
+		default = False
+	)
 	bpy.utils.register_class(PaintUVPanel)
 	bpy.utils.register_class(PaintUVOperator)
 	bpy.utils.register_class(MenuUnwrapOperator)
@@ -165,7 +159,7 @@ def unregister():
 	bpy.utils.unregister_class(PaintUVOperator)
 	bpy.utils.unregister_class(MenuUnwrapOperator)
 	bpy.types.VIEW3D_MT_uv_map.remove(MenuFuncUnwrap)
+	del bpy.types.Scene.seam_from_islands
 
 if __name__ == "__main__":
 	register()
-	bpy.context.scene.seam_from_islands = True
