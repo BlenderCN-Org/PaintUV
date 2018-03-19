@@ -48,7 +48,7 @@ def FindAndPaint():
 	# bpy.ops.object.mode_set( mode = 'EDIT' )
 	# bpy.ops.mesh.select_all( action = 'DESELECT' )
 	# bpy.ops.object.mode_set( mode = 'OBJECT' )
-	color_map = ''
+
 	# if not color map created else remove active color map and created new
 	if not CheckColorMapName(my_object.vertex_colors, 'ISLANDS_PAINT'):
 		color_map = my_object.vertex_colors.new()
@@ -73,9 +73,9 @@ def FindAndPaint():
 		bpy.ops.mesh.select_all( action = 'DESELECT' )
 		bpy.ops.object.mode_set( mode = 'OBJECT' )
 		poly.select = True
-		bpy.ops.object.mode_set(mode='EDIT')
-		bpy.ops.uv.select_linked(extend=False)
-		bpy.ops.object.mode_set(mode='VERTEX_PAINT')
+		bpy.ops.object.mode_set( mode = 'EDIT' )
+		bpy.ops.uv.select_linked( extend = False )
+		bpy.ops.object.mode_set( mode = 'VERTEX_PAINT' )
 		SetRandomBrushColor()
 		bpy.ops.paint.vertex_color_set()
 		#index += 1
