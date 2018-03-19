@@ -13,6 +13,7 @@ bl_info = {
 
 import bpy
 from random import uniform
+from bpy.props import BoolProperty
 
 
 def MenuFuncUnwrap(self, context):
@@ -40,7 +41,7 @@ def CheckColorMapName(color_maps, FindName):
 
 	return False
 
-def FindAndPaint():
+def FindAndPaint(Seam):
 	my_object = bpy.context.active_object.data
 
 	my_object.use_paint_mask = True
@@ -62,9 +63,13 @@ def FindAndPaint():
 		color_map.name = 'ISLANDS_PAINT'
 	polygons = my_object.polygons
 
+	if Seam:
+		bpy.ops.object.mode_set( mode = 'EDIT' )
+		bpy.ops.mesh.select_all( action = 'SELECT' )
+		bpy.ops.uv.seams_from_islands()
+
 	index = 0
-	for poly in polygons:
-		print("Index poly: ", poly.index)
+	for poly in polygons:						
 		for idx in poly.loop_indices:
 			if IsWhiteVertex(color_map, index):
 				bpy.ops.object.mode_set(mode='VERTEX_PAINT')
@@ -88,11 +93,18 @@ class PaintUVPanel(bpy.types.Panel):
 	bl_category = "Nexus Tools"
 	bl_context = "objectmode"
 
+	seam_from_islands = bpy.types.Scene.seam_from_islands = BoolProperty(
+		name = "Seam From Islands",
+		default = False
+	)
+
 	def draw(self, context):
 		layout = self.layout
 		obj = context.object
 		scene = context.scene
 
+		row = layout.row()
+		row.prop(scene, "seam_from_islands")
 		row = layout.row()
 		row.operator("object.paint_uv", text="Paint by UV")
 
@@ -108,7 +120,10 @@ class PaintUVOperator(bpy.types.Operator):
 		return context.mode == "OBJECT"
 
 	def execute(self, context):
-		FindAndPaint()
+		#if context.seam_from_islands:
+		FindAndPaint(True)
+		#else:
+		#	FindAndPaint(False)
 
 		return {'FINISHED'}
 
@@ -124,7 +139,7 @@ class MenuUnwrapOperator(bpy.types.Operator):
 
 	def execute(self, context):
 		bpy.ops.uv.unwrap()
-		FindAndPaint()
+		FindAndPaint(False)
 
 		return {'FINISHED'}
 
