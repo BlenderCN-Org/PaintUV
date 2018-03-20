@@ -145,6 +145,10 @@ class VIEW3D_mark_seam_paint_uv(bpy.types.Operator):
 
 	def execute(self, context):
 		bpy.ops.mesh.mark_seam(clear=False)
+		bpy.ops.object.mode_set( mode = 'EDIT' )
+		bpy.ops.mesh.select_all( action = 'SELECT' )
+		bpy.ops.uv.unwrap()
+		bpy.ops.mesh.select_all( action = 'DESELECT' )
 		FindAndPaint()
 		bpy.ops.object.mode_set( mode = 'EDIT' )
 
@@ -167,13 +171,12 @@ keymapsList = [
 		'name_view': "3D View",
 		'space_type': "VIEW_3D",
 		'prop_name': "VIEW3D_paint_uv_menu"
+	},
+	{
+		'name_view': "Image",
+		'space_type': "IMAGE_EDITOR",
+		'prop_name': "VIEW3D_paint_uv_menu"
 	}
-	# },
-	# {
-	# 	'name_view': "Image",
-	# 	'space_type': "IMAGE_EDITOR",
-	# 	'prop_name': "uv_menu"
-	# },
 	# {
 	# 	'name_view': "Graph Editor",
 	# 	'space_type': "GRAPH_EDITOR",
@@ -197,7 +200,6 @@ def register():
 	bpy.utils.register_class(PaintUVOperator)
 	bpy.utils.register_class(MenuUnwrapOperator)
 	bpy.types.VIEW3D_MT_uv_map.append(MenuFuncUnwrap)
-	# VIEW3D_paint_uv_menu
 
 	kc = bpy.context.window_manager.keyconfigs.addon
 	if kc:
